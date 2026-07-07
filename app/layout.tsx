@@ -21,8 +21,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="h-full flex flex-col">
-        <div className="flex h-full gap-8 ">
+      <body className="flex h-full flex-col">
+        <div className="flex h-full">
           <Sidebar />
           {children}
         </div>
