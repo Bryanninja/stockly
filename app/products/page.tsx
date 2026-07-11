@@ -1,7 +1,7 @@
 import { DataTable } from "../_components/ui/data-table";
 import { productTableColumns } from "./_components/table-columns";
 import { getProducts } from "../_data-access/product/get-products";
-import AddProductButton from "./_components/add-products-button";
+import AddProductButton from "./_components/create-products-button";
 
 const Product = async () => {
   const productsFromDb = await getProducts();
