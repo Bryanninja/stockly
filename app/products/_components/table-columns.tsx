@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+} from "@/app/_components/ui/alert-dialog";
 import { Badge } from "@/app/_components/ui/badge";
 import { Button } from "@/app/_components/ui/button";
 import {
@@ -22,6 +26,7 @@ import {
   MoreHorizontalIcon,
   TrashIcon,
 } from "lucide-react";
+import DeleteProductsDialogContent from "./delete-dialog-content";
 
 const getStatusLabel = (status: string) => {
   return status === "IN STOCK" ? "Em estoque" : "Fora de estoque";
@@ -66,32 +71,40 @@ export const productTableColumns: ColumnDef<Product>[] = [
     cell: (row) => {
       const product = row.row.original;
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger render={<Button variant="ghost" />}>
-            <MoreHorizontalIcon />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>Ações</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(product.id)}
-              >
-                <ClipboardCopyIcon />
-                Copiar ID
-              </DropdownMenuItem>
+        <AlertDialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button variant="ghost" />}>
+              <MoreHorizontalIcon />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => navigator.clipboard.writeText(product.id)}
+                >
+                  <ClipboardCopyIcon />
+                  Copiar ID
+                </DropdownMenuItem>
 
-              <DropdownMenuItem>
-                <EditIcon />
-                Editar
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-400 hover:text-red-700">
-              <TrashIcon />
-              Deletar
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                <DropdownMenuItem>
+                  <EditIcon />
+                  Editar
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <AlertDialogTrigger
+                nativeButton={false}
+                render={
+                  <DropdownMenuItem variant="destructive" className="w-full cursor-pointer">
+                    <TrashIcon className="mr-2 h-4 w-4" />
+                    Deletar
+                  </DropdownMenuItem>
+                }
+              />
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DeleteProductsDialogContent productId={product.id} />
+        </AlertDialog>
       );
     },
   },

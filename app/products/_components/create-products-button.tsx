@@ -29,6 +29,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { createProductSchema } from "@/app/_actions/product/create-product/schema";
 import { createProduct } from "@/app/_actions/product/create-product";
+import { toast } from "sonner";
 
 const CreateProductButton = () => {
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
@@ -47,8 +48,10 @@ const CreateProductButton = () => {
     try {
       await createProduct(data);
       setDialogIsOpen(false);
+      toast.success("O Produto foi criado com sucesso!");
     } catch (error) {
       console.error(error);
+      toast.error("Ocorreu um erro ao criar o produto!");
     }
   };
 
