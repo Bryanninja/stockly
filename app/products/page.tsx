@@ -1,10 +1,13 @@
 import { DataTable } from "../_components/ui/data-table";
 import { productTableColumns } from "./_components/table-columns";
-import { getProducts } from "../_data-access/product/get-products";
+import {
+  cachedGetProducts,
+  getProducts,
+} from "../_data-access/product/get-products";
 import AddProductButton from "./_components/create-products-button";
 
 const Product = async () => {
-  const productsFromDb = await getProducts();
+  const productsFromDb = await cachedGetProducts();
 
   const products = productsFromDb.map((product) => ({
     ...product,
