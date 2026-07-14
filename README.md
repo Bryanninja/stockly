@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📦 Stockly
 
-## Getting Started
+**Stockly** é um sistema moderno de gerenciamento de estoque projetado para ser rápido, escalável e com uma interface de usuário premium. Construído com as tecnologias mais recentes do ecossistema React, ele demonstra a aplicação de arquiteturas avançadas, como **Next.js App Router** e **Server Actions**, eliminando a necessidade de uma API REST tradicional.
 
-First, run the development server:
+---
 
+## ✨ Funcionalidades
+
+- **Gerenciamento Completo (CRUD):** Criação, listagem, edição e exclusão de produtos em tempo real.
+- **Cache Inteligente:** Utilização de `unstable_cache` e `revalidateTag` do Next.js para atualizações cirúrgicas de interface sem recarregamento pesado da página.
+- **Validação Rigorosa:** Formulários validados tanto no Client-side quanto no Server-side utilizando **Zod**, garantindo a integridade do banco de dados.
+- **Interface Acessível e Premium:** Componentes construídos com **Shadcn UI** e **Tailwind CSS**, seguindo padrões rigorosos de acessibilidade (W3C/Radix UI).
+- **Feedback Visual (Toasts):** Alertas em tempo real utilizando Sonner para ações de sucesso ou falha.
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+**Front-end & Back-end (Fullstack Framework)**
+- [Next.js (App Router)](https://nextjs.org/) - Framework React com Server Components e Server Actions.
+- [TypeScript](https://www.typescriptlang.org/) - Tipagem estática para maior segurança e previsibilidade.
+- [Tailwind CSS](https://tailwindcss.com/) - Estilização utilitária rápida e responsiva.
+- [Shadcn UI](https://ui.shadcn.com/) - Componentes de interface acessíveis e altamente customizáveis.
+- [React Hook Form](https://react-hook-form.com/) - Gerenciamento de estado de formulários com alta performance.
+
+**Banco de Dados & ORM**
+- [Prisma ORM](https://www.prisma.io/) - ORM moderno para interação com o banco de dados.
+- [Zod](https://zod.dev/) - Validação de esquemas de dados.
+
+---
+
+## 🚀 Como rodar o projeto localmente
+
+Siga os passos abaixo para rodar o Stockly na sua máquina:
+
+### 1. Pré-requisitos
+- [Node.js](https://nodejs.org/en/) (versão 18 ou superior)
+- Um banco de dados relacional configurado (ex: PostgreSQL) ou apenas SQLite para testes locais.
+
+### 2. Clonando o repositório
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Bryanninja/stockly.git
+cd stockly
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Instalando as dependências
+```bash
+npm install
+# ou
+yarn install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Configurando as Variáveis de Ambiente
+Crie um arquivo `.env` na raiz do projeto e adicione a URL do seu banco de dados:
+```env
+DATABASE_URL="postgresql://usuario:senha@localhost:5432/stockly?schema=public"
+```
+*(Caso esteja usando o SQLite padrão do Prisma, a URL já virá pré-configurada no formato `file:./dev.db` na documentação do Prisma)*
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 5. Configurando o Banco de Dados
+Rode o comando abaixo para gerar as tabelas no seu banco de dados via Prisma:
+```bash
+npx prisma db push
+# ou
+npx prisma migrate dev
+```
 
-## Learn More
+### 6. Rodando a aplicação
+```bash
+npm run dev
+```
+O projeto estará disponível no seu navegador em: `http://localhost:3000`
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 👨‍💻 Autor
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Bryan (Desenvolvedor Front-end & UI/UX Designer)**
+- [LinkedIn](https://linkedin.com/in/alexbryannt)
+- [GitHub](https://github.com/Bryanninja)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*Projeto desenvolvido com foco em performance, código limpo e arquiteturas modernas do ecossistema React/Next.js.*
