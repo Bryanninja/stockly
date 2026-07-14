@@ -1,9 +1,7 @@
 "use client";
+import { useState } from "react";
 
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-} from "@/app/_components/ui/alert-dialog";
+import { AlertDialog } from "@/app/_components/ui/alert-dialog";
 import { Badge } from "@/app/_components/ui/badge";
 import { Button } from "@/app/_components/ui/button";
 import {
@@ -27,6 +25,8 @@ import {
   TrashIcon,
 } from "lucide-react";
 import DeleteProductsDialogContent from "./delete-dialog-content";
+import { Dialog, DialogTrigger } from "@/app/_components/ui/dialog";
+import UpsertProductDialogContent from "./upsert-dialog-content";
 
 const getStatusLabel = (status: string) => {
   return status === "IN STOCK" ? "Em estoque" : "Fora de estoque";
@@ -68,44 +68,63 @@ export const productTableColumns: ColumnDef<Product>[] = [
   {
     accessorKey: "actions",
     header: "Ações",
-    cell: (row) => {
-      const product = row.row.original;
-      return (
-        <AlertDialog>
-          <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="ghost" />}>
-              <MoreHorizontalIcon />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(product.id)}
-                >
-                  <ClipboardCopyIcon />
-                  Copiar ID
-                </DropdownMenuItem>
-
-                <DropdownMenuItem>
-                  <EditIcon />
-                  Editar
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <AlertDialogTrigger
-                nativeButton={false}
-                render={
-                  <DropdownMenuItem variant="destructive" className="w-full cursor-pointer">
-                    <TrashIcon className="mr-2 h-4 w-4" />
-                    Deletar
-                  </DropdownMenuItem>
-                }
-              />
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DeleteProductsDialogContent productId={product.id} />
-        </AlertDialog>
-      );
-    },
+    cell: (row) => <ProductTableDropdownMenu product={row.row.original} />,
   },
 ];
+
+const ProductTableDropdownMenu = ({ product }: { product: Product }) => {
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  return (
+    <>
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <UpsertProductDialogContent
+          defaultValues={{
+            id: product.id,
+            name: product.name,
+            price: Number(product.price),
+            stock: product.stock,
+          }}
+
+          onSuccess={() => setEditOpen(false)}
+        />
+      </Dialog>
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DeleteProductsDialogContent productId={product.id} />
+      </AlertDialog>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger render={<Button variant="ghost" />}>
+          <MoreHorizontalIcon />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(product.id)}
+            >
+              <ClipboardCopyIcon className="mr-2 h-4 w-4" />
+              Copiar ID
+            </DropdownMenuItem>
+
+            <DropdownMenuItem onClick={() => setEditOpen(true)}>
+              <EditIcon className="mr-2 h-4 w-4" />
+              Editar
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            variant="destructive"
+            className="w-full cursor-pointer"
+            onClick={() => setDeleteOpen(true)}
+          >
+            <TrashIcon className="mr-2 h-4 w-4" />
+            Deletar
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
+};

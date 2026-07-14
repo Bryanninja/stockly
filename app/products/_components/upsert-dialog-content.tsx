@@ -1,7 +1,7 @@
 "use client";
 
-import { createProduct } from "@/app/_actions/product/create-product";
-import { createProductSchema } from "@/app/_actions/product/create-product/schema";
+import { upsertProduct } from "@/app/_actions/product/create-product";
+import { upsertProductSchema } from "@/app/_actions/product/create-product/schema";
 import { Button } from "@/app/_components/ui/button";
 import {
   DialogClose,
@@ -29,31 +29,38 @@ import { toast } from "sonner";
 import z from "zod";
 
 interface UpsertProductDialogContent {
+  defaultValues?: upsertProductSchema;
   onSuccess?: () => void;
 }
 
 const UpsertProductDialogContent = ({
+  defaultValues,
   onSuccess,
 }: UpsertProductDialogContent) => {
+  const isEditing = !!defaultValues;
+
   const form = useForm({
     shouldUnregister: true,
-    resolver: zodResolver(createProductSchema),
-    defaultValues: {
+    resolver: zodResolver(upsertProductSchema),
+    defaultValues: defaultValues ?? {
       name: "",
       price: 0,
       stock: 1,
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof createProductSchema>) => {
+  const onSubmit = async (data: z.infer<typeof upsertProductSchema>) => {
     try {
-      await createProduct(data);
+      await upsertProduct({ ...data, id: defaultValues?.id });
       onSuccess?.();
-
-      toast.success("O Produto foi criado com sucesso!");
+      {
+        isEditing
+          ? toast.success("Produto editado com sucesso!")
+          : toast.success("Produto criado com sucesso!");
+      }
     } catch (error) {
       console.error(error);
-      toast.error("Ocorreu um erro ao criar o produto!");
+      toast.error("Ocorreu um erro ao salvar o produto!");
     }
   };
 
@@ -62,7 +69,7 @@ const UpsertProductDialogContent = ({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <DialogHeader>
-            <DialogTitle>Criar produto</DialogTitle>
+            <DialogTitle>{isEditing ? "Editar" : "Criar"} produto</DialogTitle>
             <DialogDescription>Insira as informações abaixo!</DialogDescription>
           </DialogHeader>
 
