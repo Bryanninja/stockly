@@ -1,8 +1,5 @@
-import { PlusIcon } from "lucide-react";
-import { buttonVariants } from "../_components/ui/button";
-import { Sheet, SheetTrigger } from "../_components/ui/sheet";
-import UpsertSheetsContent from "./_components/upsert-sheets-content";
 import { getProducts } from "../_data-access/product/get-products";
+import CreateSaleButton from "./_components/create-sale-button";
 
 const SalesPage = async () => {
   const productsDb = await getProducts();
@@ -22,12 +19,7 @@ const SalesPage = async () => {
           <h2 className="text-xl font-semibold">Vendas</h2>
         </div>
 
-        <Sheet>
-          <SheetTrigger className={buttonVariants()}>
-            <PlusIcon /> Nova Venda
-          </SheetTrigger>
-          <UpsertSheetsContent productOptions={products} />
-        </Sheet>
+        <CreateSaleButton products={products} />
       </div>
 
       {/* <DataTable columns={productTableColumns} data={products} /> */}
