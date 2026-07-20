@@ -21,6 +21,7 @@ import { Input } from "@/app/_components/ui/input";
 import {
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "@/app/_components/ui/sheet";
@@ -37,12 +38,14 @@ import {
 import { formatCurrency } from "@/app/_helper/currency";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Product } from "@prisma/client";
-import { PlusIcon } from "lucide-react";
+import { CheckIcon, PlusIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
 import SalesDropdownMenu from "./table-dropdown-menu";
+import { createSale } from "@/app/_actions/sale/create-sale";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   productId: z.uuid({
@@ -53,6 +56,7 @@ const formSchema = z.object({
 
 interface UpsertSheetsContent {
   productOptions: Product[];
+  onSubmitSuccess: () => void;
 }
 
 interface selectedProduct {
@@ -62,7 +66,10 @@ interface selectedProduct {
   quantity: number;
 }
 
-const UpsertSheetsContent = ({ productOptions }: UpsertSheetsContent) => {
+const UpsertSheetsContent = ({
+  productOptions,
+  onSubmitSuccess,
+}: UpsertSheetsContent) => {
   type FormSchema = z.infer<typeof formSchema>;
 
   const [selectedProducts, setSelectedProducts] = useState<selectedProduct[]>(
@@ -84,41 +91,51 @@ const UpsertSheetsContent = ({ productOptions }: UpsertSheetsContent) => {
     );
     if (!selectedProduct) return;
 
-    // 2. Vou mexer no meu carrinho de compras atual...
-    setSelectedProducts((currentProducts) => {
-      // 3. Olhei dentro do carrinho para ver se esse produto já foi adicionado antes
-      const existingProduct = currentProducts.find(
-        (product) => product.id === selectedProduct.id,
-      );
-      // 4. Se o produto JÁ ESTAVA NO CARRINHO...
-      if (existingProduct) {
-        // Uso a esteira (.map) para olhar item por item do carrinho...
-        return currentProducts.map((product) => {
-          // Quando eu achar o produto certo na esteira, crio um clone dele e somo a quantidade!
-          if (product.id === selectedProduct.id) {
-            return {
-              ...product,
-              quantity: product.quantity + data.quantity,
-            };
-          }
-          // Se não for ele, só deixo passar direto.
-          return product;
+    // 2. Verifico se o produto já está no carrinho
+    const existingProduct = selectedProducts.find(
+      (product) => product.id === selectedProduct.id,
+    );
+
+    // 3. Se JÁ ESTAVA NO CARRINHO, verifico o estoque e somo a quantidade
+    if (existingProduct) {
+      const productIsOutOfStock =
+        existingProduct.quantity + data.quantity > selectedProduct.stock;
+      if (productIsOutOfStock) {
+        form.setError("quantity", {
+          message: "Quantidade indisponível em estoque",
         });
+        return;
       }
 
-      // 5. Se o produto NÃO ESTAVA NO CARRINHO...
-      // Pego tudo que já tinha (...currentProducts) e coloco o produto novo no final.
-      return [
+      setSelectedProducts((currentProducts) =>
+        currentProducts.map((product) => {
+          if (product.id === selectedProduct.id) {
+            return { ...product, quantity: product.quantity + data.quantity };
+          }
+          return product;
+        }),
+      );
+    } else {
+      // 4. Se NÃO ESTAVA NO CARRINHO, verifico o estoque e adiciono na lista
+      const productIsOutOfStock = data.quantity > selectedProduct.stock;
+      if (productIsOutOfStock) {
+        form.setError("quantity", {
+          message: "Quantidade indisponível em estoque",
+        });
+        return;
+      }
+
+      setSelectedProducts((currentProducts) => [
         ...currentProducts,
         {
           ...selectedProduct,
           price: Number(selectedProduct.price),
           quantity: data.quantity,
         },
-      ];
-    });
+      ]);
+    }
 
-    // 6. Limpo a caixinha para o próximo produto
+    // 5. Só limpo o formulário depois de tudo resolvido
     form.reset();
   };
 
@@ -132,6 +149,21 @@ const UpsertSheetsContent = ({ productOptions }: UpsertSheetsContent) => {
     setSelectedProducts((currentProducts) => {
       return currentProducts.filter((product) => product.id !== productId);
     });
+  };
+
+  const onSubmitSale = async () => {
+    try {
+      await createSale({
+        products: selectedProducts.map((product) => ({
+          id: product.id,
+          quantity: product.quantity,
+        })),
+      });
+      toast.success("Venda realizada com sucesso.");
+      onSubmitSuccess();
+    } catch (error) {
+      toast.error("Erro ao realizar a venda.");
+    }
   };
 
   return (
@@ -204,7 +236,7 @@ const UpsertSheetsContent = ({ productOptions }: UpsertSheetsContent) => {
       </Form>
 
       <Table>
-        <TableCaption>A list of your recent invoices.</TableCaption>
+        <TableCaption>Lista dos produtos adicionados à venda.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Produto</TableHead>
@@ -239,6 +271,13 @@ const UpsertSheetsContent = ({ productOptions }: UpsertSheetsContent) => {
           </TableRow>
         </TableFooter>
       </Table>
+
+      <SheetFooter>
+        <Button disabled={selectedProducts.length === 0} onClick={onSubmitSale}>
+          <CheckIcon />
+          Finalizar venda
+        </Button>
+      </SheetFooter>
     </SheetContent>
   );
 };
