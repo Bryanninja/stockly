@@ -42,6 +42,8 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
+import SalesDropdownMenu from "./table-dropdown-menu";
+
 const formSchema = z.object({
   productId: z.uuid({
     message: "O produto é obrigatório",
@@ -126,6 +128,12 @@ const UpsertSheetsContent = ({ productOptions }: UpsertSheetsContent) => {
     }, 0);
   }, [selectedProducts]);
 
+  const onDelete = (productId: string) => {
+    setSelectedProducts((currentProducts) => {
+      return currentProducts.filter((product) => product.id !== productId);
+    });
+  };
+
   return (
     <SheetContent className="!max-w-[700px]">
       <SheetHeader>
@@ -203,6 +211,7 @@ const UpsertSheetsContent = ({ productOptions }: UpsertSheetsContent) => {
             <TableHead>Preço Unitário</TableHead>
             <TableHead>Quantidade</TableHead>
             <TableHead>Total</TableHead>
+            <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -214,6 +223,9 @@ const UpsertSheetsContent = ({ productOptions }: UpsertSheetsContent) => {
               <TableCell className="text-right">
                 {formatCurrency(product.price * product.quantity)}
               </TableCell>
+              <TableCell className="text-right">
+                <SalesDropdownMenu onDelete={onDelete} product={product} />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -223,6 +235,7 @@ const UpsertSheetsContent = ({ productOptions }: UpsertSheetsContent) => {
             <TableCell className="text-right">
               {formatCurrency(productsTotal)}
             </TableCell>
+            <TableCell></TableCell>
           </TableRow>
         </TableFooter>
       </Table>
