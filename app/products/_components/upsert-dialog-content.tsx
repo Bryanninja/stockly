@@ -22,7 +22,8 @@ import {
 import { Input } from "@/app/_components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderIcon } from "lucide-react";
-import { useState } from "react";
+import { flattenValidationErrors } from "next-safe-action";
+import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
@@ -30,12 +31,12 @@ import z from "zod";
 
 interface UpsertProductDialogContent {
   defaultValues?: upsertProductSchema;
-  onSuccess?: () => void;
+  onSuccessSubmit?: () => void;
 }
 
 const UpsertProductDialogContent = ({
   defaultValues,
-  onSuccess,
+  onSuccessSubmit,
 }: UpsertProductDialogContent) => {
   const isEditing = !!defaultValues;
 
@@ -49,19 +50,33 @@ const UpsertProductDialogContent = ({
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof upsertProductSchema>) => {
-    try {
-      await upsertProduct({ ...data, id: defaultValues?.id });
-      onSuccess?.();
-      {
-        isEditing
-          ? toast.success("Produto editado com sucesso!")
-          : toast.success("Produto criado com sucesso!");
+  const { execute: executeUpsertProduct } = useAction(upsertProduct, {
+    onSuccess: () => {
+      isEditing
+        ? toast.success("Produto editado com sucesso!")
+        : toast.success("Produto criado com sucesso!");
+      onSuccessSubmit?.();
+    },
+
+    onError: ({ error: { validationErrors, serverError } }) => {
+      const flattenedErrors = flattenValidationErrors(validationErrors);
+      const errorMessage = serverError ?? flattenedErrors.formErrors[0];
+      toast.error(errorMessage);
+
+      // Mostra também embaixo do campo nome
+      if (errorMessage?.includes("already exists")) {
+        form.setError("name", {
+          message: "Já existe um produto com esse nome",
+        });
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Ocorreu um erro ao salvar o produto!");
-    }
+    },
+  });
+
+  const onSubmit = async (data: z.infer<typeof upsertProductSchema>) => {
+    executeUpsertProduct({
+      ...data,
+      id: defaultValues?.id,
+    });
   };
 
   return (

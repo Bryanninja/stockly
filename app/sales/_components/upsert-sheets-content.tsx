@@ -82,7 +82,8 @@ const UpsertSheetsContent = ({
   const { execute: executeCreateSale } = useAction(createSale, {
     onError: ({ error: { validationErrors, serverError } }) => {
       const flattenedErrors = flattenValidationErrors(validationErrors);
-      toast.error(serverError ?? flattenedErrors.formErrors[0]);
+      const errorMessage = serverError ?? flattenedErrors.formErrors[0];
+      toast.error(errorMessage);
     },
 
     onSuccess: () => {

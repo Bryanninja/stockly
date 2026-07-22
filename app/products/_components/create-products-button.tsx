@@ -20,7 +20,9 @@ const upsertProductButton = () => {
         }
       />
 
-      <UpsertProductDialogContent onSuccess={() => setDialogIsOpen(false)} />
+      <UpsertProductDialogContent
+        onSuccessSubmit={() => setDialogIsOpen(false)}
+      />
     </Dialog>
   );
 };

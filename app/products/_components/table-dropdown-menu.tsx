@@ -43,7 +43,7 @@ const ProductsTableDropdownMenu = ({
             stock: product.stock,
           }}
 
-          onSuccess={() => setEditOpen(false)}
+          onSuccessSubmit={() => setEditOpen(false)}
         />
       </Dialog>
 
