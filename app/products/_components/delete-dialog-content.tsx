@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/app/_components/ui/alert-dialog";
+import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
 interface DeleteProductsDialogContentProps {
@@ -17,14 +18,13 @@ interface DeleteProductsDialogContentProps {
 const DeleteProductsDialogContent = ({
   productId,
 }: DeleteProductsDialogContentProps) => {
+  const { execute: executeDeleteProduct } = useAction(deleteProduct, {
+    onSuccess: () => toast.success("O produto foi deletado!"),
+    onError: () => toast.error("Erro ao deletar o produto!"),
+  });
+
   const handleContinueClick = async () => {
-    try {
-      await deleteProduct({ id: productId });
-      toast.success("O produto foi deletado!");
-    } catch (error) {
-      console.error(error);
-      toast.error("Erro ao deletar o produto!");
-    }
+    executeDeleteProduct({ id: productId });
   };
 
   return (
