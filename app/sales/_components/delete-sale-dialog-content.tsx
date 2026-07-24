@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteProduct } from "@/app/_actions/product/delete-product";
+import { deleteSale } from "@/app/_actions/sale/delete-sale";
 import {
   AlertDialogAction,
   AlertDialogCancel,
@@ -13,31 +13,28 @@ import {
 import { toast } from "sonner";
 import { useAction } from "next-safe-action/hooks";
 
-interface DeleteProductDialogContentProps {
-  productId: string;
+interface DeleteSaleDialogContentProps {
+  saleId: string;
 }
 
-const DeleteProductDialogContent = ({
-  productId,
-}: DeleteProductDialogContentProps) => {
-  const { execute: executeDeleteProduct } = useAction(deleteProduct, {
+const DeleteSaleDialogContent = ({ saleId }: DeleteSaleDialogContentProps) => {
+  const { execute: executeDeleteSale } = useAction(deleteSale, {
     onSuccess: () => {
-      toast.success("Produto excluído com sucesso!");
+      toast.success("Venda cancelada! Os produtos retornaram ao estoque.");
     },
     onError: () => {
-      toast.error("Ocorreu um erro ao excluir o produto.");
+      toast.error("Ocorreu um erro ao cancelar a venda.");
     },
   });
 
-  const handleContinueClick = () => executeDeleteProduct({ id: productId });
+  const handleContinueClick = () => executeDeleteSale({ id: saleId });
 
   return (
     <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
         <AlertDialogDescription>
-          Você está prestes a excluir este produto. Esta ação não pode ser
-          desfeita. Deseja continuar?
+          Você está prestes a excluir esta venda. Esta ação irá devolver as quantidades dos produtos ao estoque e não pode ser desfeita. Deseja continuar?
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
@@ -50,4 +47,4 @@ const DeleteProductDialogContent = ({
   );
 };
 
-export default DeleteProductDialogContent;
+export default DeleteSaleDialogContent;

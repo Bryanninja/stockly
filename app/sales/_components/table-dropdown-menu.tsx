@@ -1,65 +1,45 @@
+import { deleteSale } from "@/app/_actions/sale/delete-sale";
+import { AlertDialog } from "@/app/_components/ui/alert-dialog";
 import { Button } from "@/app/_components/ui/button";
+import { Dialog } from "@/app/_components/ui/dialog";
 import {
   DropdownMenu,
+  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from "@/app/_components/ui/dropdown-menu";
-
-import { AlertDialog } from "@/app/_components/ui/alert-dialog";
-
+import DeleteSaleDialogContent from "./delete-sale-dialog-content";
+import UpsertProductDialogContent from "@/app/products/_components/upsert-dialog-content";
+import { Sale } from "@prisma/client";
 import {
+  MoreHorizontalIcon,
   ClipboardCopyIcon,
   EditIcon,
-  MoreHorizontalIcon,
   TrashIcon,
 } from "lucide-react";
-import DeleteProductsDialogContent from "./delete-dialog-content";
-import { Dialog } from "@/app/_components/ui/dialog";
-import UpsertProductDialogContent from "./upsert-dialog-content";
-import { useState } from "react";
-import { Product } from "@prisma/client";
-import { toast } from "sonner";
 import { useAction } from "next-safe-action/hooks";
-import { deleteProduct } from "@/app/_actions/product/delete-product";
+import { useState } from "react";
+import { toast } from "sonner";
 
-interface ProductsTableDropdownMenuProps {
-  product: Product;
+interface SalesTableDropdownMenuProps {
+  sale: Pick<Sale, "id">;
 }
 
-const ProductsTableDropdownMenu = ({
-  product,
-}: ProductsTableDropdownMenuProps) => {
-  const [editOpen, setEditOpen] = useState(false);
+const SalesTableDropdownMenu = ({ sale }: SalesTableDropdownMenuProps) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const handleCopyToClipboardClick = () => {
-    navigator.clipboard.writeText(product.id);
+    navigator.clipboard.writeText(sale.id);
     toast.success("ID copiado para a área de transferência.");
   };
 
   return (
     <>
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <UpsertProductDialogContent
-          defaultValues={{
-            id: product.id,
-            name: product.name,
-            price: Number(product.price),
-            stock: product.stock,
-          }}
-
-          onSuccessSubmit={() => setEditOpen(false)}
-        />
-      </Dialog>
-
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DeleteProductsDialogContent
-          productId={product.id}
-        />
+        <DeleteSaleDialogContent saleId={sale.id} />
       </AlertDialog>
 
       <DropdownMenu>
@@ -74,7 +54,7 @@ const ProductsTableDropdownMenu = ({
               Copiar ID
             </DropdownMenuItem>
 
-            <DropdownMenuItem onClick={() => setEditOpen(true)}>
+            <DropdownMenuItem>
               <EditIcon className="mr-2 h-4 w-4" />
               Editar
             </DropdownMenuItem>
@@ -94,4 +74,4 @@ const ProductsTableDropdownMenu = ({
   );
 };
 
-export default ProductsTableDropdownMenu;
+export default SalesTableDropdownMenu;
